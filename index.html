@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+            background-color: #2F3338;
+        }
+        .container {
+            width: 400px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .text {
+            top: -14px;
+            left: 2.5px;
+            position: absolute;
+            color: #9AA0A6;
+        }
+        .correct {
+            color: #fff;
+        }
+
+        .incorrect {
+            color: red;
+        }
+
+        .area {
+            font-family: 'Courier New', Courier, monospace;
+            width: 100%;
+            font-size: 16px;
+            height: 100%;
+            border: none;
+            color: #6B7075;
+            background-color: #2F3338;
+
+        }
+        .re{
+            font-size: 34px;
+            position: absolute;
+            right: 413px;
+            top: 0px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p class="text"></p>
+        <textarea name="" id="" class="area"></textarea>
+        <a href="" class="re"><i class='bx bx-refresh'></i></a>
+    </div>
+    
+
+    <script>
+        let matnlar = [
+            "Bugun 7-b sinf uchun frontend darsi",
+            "Salom dunyo", 
+            "Hozir oxirgi dars",
+            "Ertanga inglis tili yoq"
+        ]
+
+
+        let randomMatn = matnlar[Math.floor(Math.random() * matnlar.length)]
+        const text = document.querySelector(".text")
+        text.innerHTML = randomMatn
+        const area = document.querySelector(".area")
+
+        area.oninput = () => {
+            let userText = area.value   
+            let str = ""
+            for(let i = 0; i < randomMatn.length; i++){
+                if(userText[i] == null){
+                    str += `<span>${randomMatn[i]}</span>`
+                }else if(userText[i] == randomMatn[i]){
+                    str += `<span class = "correct">${randomMatn[i]}</span>`
+                }else {
+                     str += `<span class = "incorrect">${randomMatn[i]}</span>`
+                }
+            }
+            text.innerHTML = str
+        }
+
+            
+    </script>
+</body>
+</html>
