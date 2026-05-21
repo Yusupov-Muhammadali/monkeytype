@@ -1,91 +1,237 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uz">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Tez Yozish Trenajyori</title>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
         body {
             font-family: 'Courier New', Courier, monospace;
-            font-size: 16px;
-            background-color: #2F3338;
+            background-color: #323437;
+            color: #646669;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
         }
-        .container {
-            width: 400px;
-            margin: 0 auto;
+        .wrapper {
+            width: 800px; /* Matnlar ko'paygani uchun kenglikni oshirdik */
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
             position: relative;
         }
-        .text {
-            top: -14px;
-            left: 2.5px;
+        /* Statistika paneli */
+        .stats {
+            display: flex;
+            gap: 30px;
+            font-size: 24px;
+            color: #e2b714;
+            font-weight: bold;
+        }
+        .stats span {
+            font-size: 18px;
+            color: #646669;
+            font-weight: normal;
+        }
+        /* Matn konteyneri */
+        .container {
+            position: relative;
+            cursor: text;
+        }
+        .text-display {
+            font-size: 24px;
+            line-height: 1.6;
+            word-break: break-word;
+            user-select: none;
+            text-align: justify;
+        }
+        /* Harf holatlari */
+        .char {
+            position: relative;
+            color: #646669;
+        }
+        .char.correct {
+            color: #d1d0c5;
+        }
+        .char.incorrect {
+            color: #ca4754;
+            border-bottom: 2px solid #ca4754;
+        }
+        /* Miltillovchi kursor */
+        .char.current::before {
+            content: "";
             position: absolute;
-            color: #9AA0A6;
+            left: 0;
+            top: 10%;
+            width: 2px;
+            height: 80%;
+            background-color: #e2b714;
+            animation: blink 1s infinite;
         }
-        .correct {
-            color: #fff;
+        @keyframes blink {
+            50% { opacity: 0; }
         }
-
-        .incorrect {
-            color: red;
-        }
-
-        .area {
-            font-family: 'Courier New', Courier, monospace;
-            width: 100%;
-            font-size: 16px;
-            height: 100%;
-            border: none;
-            color: #6B7075;
-            background-color: #2F3338;
-
-        }
-        .re{
-            font-size: 34px;
+        /* Yashirin textarea */
+        .hidden-input {
             position: absolute;
-            right: 413px;
-            top: 0px;
+            opacity: 0;
+            z-index: -10;
+        }
+        /* Boshqaruv tugmalari */
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        .btn-refresh {
+            font-size: 28px;
+            color: #646669;
+            text-decoration: none;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+        .btn-refresh:hover {
+            color: #d1d0c5;
+            transform: rotate(45deg);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <p class="text"></p>
-        <textarea name="" id="" class="area"></textarea>
-        <a href="" class="re"><i class='bx bx-refresh'></i></a>
+
+    <div class="wrapper">
+        <!-- Jonli Natijalar -->
+        <div class="stats">
+            <div><span id="wpm-label">WPM:</span> <span id="wpm" style="color: #e2b714;">0</span></div>
+            <div><span id="acc-label">Aniq:</span> <span id="accuracy" style="color: #e2b714;">100</span>%</div>
+        </div>
+
+        <!-- Matn maydoni -->
+        <div class="container" id="game-container">
+            <p class="text-display" id="text-display"></p>
+            <textarea class="hidden-input" id="hidden-input" autofocus></textarea>
+        </div>
+
+        <!-- Yangilash tugmasi -->
+        <div class="controls">
+            <a href="#" class="btn-refresh" id="btn-reset"><i class='bx bx-refresh'></i></a>
+        </div>
     </div>
-    
 
     <script>
-        let matnlar = [
+        // Ko'paytirilgan va yangilangan matnlar ro'yxati
+        const matnlar = [
             "Bugun 7-b sinf uchun frontend darsi",
             "Salom dunyo", 
             "Hozir oxirgi dars",
-            "Ertanga inglis tili yoq"
-        ]
+            "Ertanga ingliz tili yoq",
+            "JavaScript yordamida ajoyib o'yinlar yaratish mumkin",
+            "Tez yozish qobiliyati dasturchilar uchun juda muhim",
+            "Muvaffaqiyatga erishish uchun har kuni oz bo'lsa ham harakat qilish kerak",
+            "Kompyuter texnologiyalari hayotimizni butunlay o'zgartirib yubordi",
+            "Frontend dasturlash orqali veb-saytlarning vizual qismini yaratamiz",
+            "Klassik klaviatura tugmalari bosilganda chiroyli ovoz chiqaradi",
+            "Dasturlashni o'rganish hech qachon kech emas, faqat xohish kerak",
+            "Yaxshi dasturchi muammoga yechim topishni yaxshi ko'radigan insondir",
+            "Inson miyasi doimiy ravishda yangi bilimlarni o'rganishga qodir",
+            "Vaqt — bu biz ega bo'lishimiz mumkin bo'lgan eng qimmatli resursdir",
+            "O'zbekiston yoshlari zamonaviy kasblarni juda tez o'rganishmoqda",
+            "Maqsad sari tashlangan kichik qadam ham sizni g'alabaga yaqinlashtiradi",
+            "HTML va CSS yordamida har qanday saytning poydevorini qurish mumkin",
+            "Doimiy mashq qilish orqali siz yozish tezligingizni yuzdan oshirishingiz mumkin",
+            "Sun'iy intellekt bugungi kunda insonlarga ko'plab ishlarda yordam beryapti",
+            "Har qanday qiyinchilik ortida albatta bitta chiroyli yutuq yashiringan bo'ladi"
+        ];
 
+        let randomMatn = "";
+        let startTime = null;
+        let isTyping = false;
 
-        let randomMatn = matnlar[Math.floor(Math.random() * matnlar.length)]
-        const text = document.querySelector(".text")
-        text.innerHTML = randomMatn
-        const area = document.querySelector(".area")
+        const textDisplay = document.getElementById("text-display");
+        const hiddenInput = document.getElementById("hidden-input");
+        const btnReset = document.getElementById("btn-reset");
+        const gameContainer = document.getElementById("game-container");
+        
+        const wpmDisplay = document.getElementById("wpm");
+        const accDisplay = document.getElementById("accuracy");
 
-        area.oninput = () => {
-            let userText = area.value   
-            let str = ""
-            for(let i = 0; i < randomMatn.length; i++){
-                if(userText[i] == null){
-                    str += `<span>${randomMatn[i]}</span>`
-                }else if(userText[i] == randomMatn[i]){
-                    str += `<span class = "correct">${randomMatn[i]}</span>`
-                }else {
-                     str += `<span class = "incorrect">${randomMatn[i]}</span>`
-                }
-            }
-            text.innerHTML = str
+        function initGame() {
+            randomMatn = matnlar[Math.floor(Math.random() * matnlar.length)];
+            hiddenInput.value = "";
+            startTime = null;
+            isTyping = false;
+            wpmDisplay.innerText = "0";
+            accDisplay.innerText = "100";
+            
+            textDisplay.innerHTML = randomMatn.split("").map((char, index) => {
+                let cls = index === 0 ? "char current" : "char";
+                return `<span class="${cls}">${char}</span>`;
+            }).join("");
+
+            hiddenInput.focus();
         }
 
+        gameContainer.addEventListener("click", () => hiddenInput.focus());
+
+        hiddenInput.addEventListener("input", () => {
+            const userText = hiddenInput.value;
+            const charSpans = textDisplay.querySelectorAll(".char");
             
+            if (!isTyping && userText.length > 0) {
+                startTime = new Date();
+                isTyping = true;
+            }
+
+            let correctChars = 0;
+
+            charSpans.forEach((span, index) => {
+                const userChar = userText[index];
+                
+                span.classList.remove("current");
+                if (index === userText.length) {
+                    span.classList.add("current");
+                }
+
+                if (userChar == null) {
+                    span.classList.remove("correct", "incorrect");
+                } else if (userChar === span.innerText) {
+                    span.classList.add("correct");
+                    span.classList.remove("incorrect");
+                    correctChars++;
+                } else {
+                    span.classList.add("incorrect");
+                    span.classList.remove("correct");
+                }
+            });
+
+            if(userText.length >= randomMatn.length && charSpans[randomMatn.length - 1]) {
+                charSpans[randomMatn.length - 1].classList.remove("current");
+            }
+
+            if (userText.length > 0) {
+                let acc = Math.round((correctChars / userText.length) * 100);
+                accDisplay.innerText = acc < 0 || !acc ? 0 : acc;
+
+                let timeElapsed = (new Date() - startTime) / 1000 / 60;
+                if (timeElapsed > 0) {
+                    let wpm = Math.round((userText.length / 5) / timeElapsed);
+                    wpmDisplay.innerText = wpm;
+                }
+            }
+        });
+
+        btnReset.addEventListener("click", (e) => {
+            e.preventDefault();
+            initGame();
+        });
+
+        initGame();
     </script>
 </body>
 </html>
